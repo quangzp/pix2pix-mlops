@@ -1,29 +1,53 @@
+import os
 from pathlib import Path
-
-from loguru import logger
-from tqdm import tqdm
-import typer
-
-from mlops.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
-
-app = typer.Typer()
+from torch.utils.data import DataLoader
+from PIL import Image
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = RAW_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    # ----------------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Processing dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Processing dataset complete.")
-    # -----------------------------------------
+class Dataset(torch.utils.data.Dataset):
+   
+    def __init__(self, root_dir, split="train", transform=None):
+        self.root_dir = Path(root_dir)
+        self.split = split
+        self.transform = transform
+        
+        self.sketch_dir = self.root_dir / split / "sketch"
+        self.real_dir = self.root_dir / split / "photo"
+
+        self.files = sorted(os.listdir(self.sketch_dir))
+
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, idx):
+        filename = self.files[idx]
+
+        sketch_path = self.sketch_dir / filename
+        real_path = self.real_dir / filename
+
+        sketch = Image.open(sketch_path).convert("RGB")
+        real = Image.open(real_path).convert("RGB")
+
+        if self.transform:
+            sketch = self.transform(sketch)
+            real = self.transform(real)
+
+        return {"sketch": sketch, "real": real}
 
 
-if __name__ == "__main__":
-    app()
+def create_dataloader(root_dir, split, batch_size, transform, shuffle=True):
+    dataset = Dataset(
+        root_dir=root_dir,
+        split=split,
+        transform=transform
+    )
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        num_workers=4,
+        pin_memory=True
+    )
+
+    return dataloader
