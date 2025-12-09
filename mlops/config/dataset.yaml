@@ -1,0 +1,9 @@
+dataset:
+  image_size: 256
+  sketch_ext: ".jpg"
+  image_ext: ".jpg"
+  # resize ảnh về NxN
+  resize: 256
+
+  # nếu true thì xoá processed trước khi chạy
+  clean_processed: true

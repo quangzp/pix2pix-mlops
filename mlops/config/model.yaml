@@ -1,0 +1,4 @@
+model:
+  name: "pix2pix"
+  generator_channels: 64
+  discriminator_channels: 64
