@@ -1,0 +1,7 @@
+[core]
+    remote = storage
+['remote "storage"']
+    url = https://4e481b573557.ngrok-free.app
+    auth = basic
+    user = dvcuser
+    password = quang214

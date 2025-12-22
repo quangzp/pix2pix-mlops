@@ -1,6 +1,10 @@
 # Data
 /data/
 
+# Nhưng cho phép file DVC
+!data/*.dvc
+
+
 # Mac OS-specific storage files
 .DS_Store
 
