@@ -1,8 +1,14 @@
-# Data
-/data/
+# 1. Chặn toàn bộ nội dung trong thư mục data
+data/**/*
 
-# Nhưng cho phép file DVC
-!data/*.dvc
+# 2. NHƯNG cho phép Git quét qua các thư mục con (để tìm file .dvc)
+!data/**/
+
+# 3. Cho phép các file .dvc ở bất kỳ cấp độ nào bên trong data/
+!data/**/*.dvc
+
+# 4. Cho phép các file .gitignore do DVC tự tạo ra bên trong data/
+!data/**/.gitignore
 
 
 # Mac OS-specific storage files
