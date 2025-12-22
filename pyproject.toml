@@ -17,16 +17,155 @@ classifiers = [
 ]
 requires-python = "~=3.10.0"
 
+# PYTEST CONFIGURATION
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",                          # Verbose output
+    "--strict-markers",            # Require all markers to be registered
+    "--cov=mlops",                 # Coverage for mlops package
+    "--cov-report=html",           # HTML coverage report
+    "--cov-report=term-missing",   # Show missing lines in terminal
+    "--cov-report=xml",            # XML report for CI/CD
+    "--tb=short",                  # Short traceback format
+    "-ra",                         # Show summary of all test outcomes
+    "--color=yes",                 # Colored output
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Tests that take a long time to run",
+    "skip_ci: Skip in CI environment",
+    "gpu: Tests that require GPU",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+# Minimum coverage percentage required
+# fail_under = 80
 
+# COVERAGE CONFIGURATION
+[tool.coverage.run]
+source = ["mlops"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/site-packages/*",
+    "*/.venv/*",
+    "*/venv/*",
+]
+branch = true
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "def __str__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "if typing.TYPE_CHECKING:",
+    "@abstractmethod",
+    "@abc.abstractmethod",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# RUFF CONFIGURATION (existing + enhanced)
 [tool.ruff]
 line-length = 99
-src = ["mlops"]
-include = ["pyproject.toml", "mlops/**/*.py"]
+src = ["mlops", "tests"]
+include = ["pyproject.toml", "mlops/**/*.py", "tests/**/*.py"]
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "htmlcov",
+]
 
 [tool.ruff.lint]
-extend-select = ["I"]  # Add import sorting
+extend-select = [
+    "I",    # isort
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "C90",  # mccabe complexity
+]
+ignore = [
+    "E501",   # Line too long (handled by formatter)
+    "B008",   # Do not perform function call in argument defaults
+    "C901",   # Function is too complex
+]
 
 [tool.ruff.lint.isort]
 known-first-party = ["mlops"]
 force-sort-within-sections = true
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+# MYPY CONFIGURATION (Type Checking)
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "normal"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
+# BLACK CONFIGURATION (Code Formatting)
+[tool.black]
+line-length = 99
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
 
