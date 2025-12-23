@@ -1,8 +1,5 @@
 [core]
-    remote = storage
     autostage = true
+    remote = storage
 ['remote "storage"']
-    url = https://4e481b573557.ngrok-free.app
-    auth = basic
-    user = dvcuser
-    password = quang214
+    url = D:\GENAI\K1\MLOPS\dvc-http-storage\data
