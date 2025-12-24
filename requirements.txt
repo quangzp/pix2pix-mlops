@@ -1,8 +1,54 @@
-loguru
-mkdocs
-pip
-python-dotenv
-ruff
-tqdm
-typer
+# Core ML/DL
+torch>=2.0.0
+torchvision>=0.15.0
+pytorch-lightning>=2.0.0
+torchmetrics>=1.0.0
+
+# Computer Vision
+pillow>=10.0.0
+opencv-python>=4.8.0
+albumentations>=1.3.0
+
+# Config & Environment
+python-dotenv>=1.0.0
+omegaconf>=2.3.0
+hydra-core>=1.3.0
+
+# Data & Utils
+numpy>=1.24.0
+pandas>=2.0.0
+tqdm>=4.65.0
+
+# MLOps Tools
+mlflow>=2.8.0
+dvc[s3]>=3.0.0
+wandb>=0.15.0
+
+# Logging
+loguru>=0.7.0
+
+# CLI
+typer[all]>=0.9.0
+click>=8.1.0
+
+# Code Quality
+ruff>=0.1.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.5.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.4.0
+
+# Development
+ipython>=8.15.0
+jupyter>=1.0.0
+
+# Install package in editable mode
 -e .

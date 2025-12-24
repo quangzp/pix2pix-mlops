@@ -1,0 +1,48 @@
+# Main config file
+defaults:
+  - _self_
+  - paths
+  - dataset
+  - model
+  - training
+  - params
+
+# Project metadata
+project_name: "sketch2image-mlops"
+version: "0.1.0"
+seed: 42
+
+# Experiment tracking
+experiment:
+  name: "pix2pixhd_baseline"
+  tags:
+    - "sketch2image"
+    - "pix2pix"
+    - "gan"
+  tracking: "mlflow"
+  log_model: true
+
+# Logging config
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  log_images_every_n_epochs: 1
+  log_gradients: false
+
+# Hardware config
+device: "mps" # cuda 
+num_workers: 4
+pin_memory: true
+
+# Output
+output_dir: "outputs"
+checkpoint_dir: "${paths.checkpoints}"
+
+# Hydra config
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: false
