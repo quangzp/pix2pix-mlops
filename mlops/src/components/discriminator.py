@@ -3,7 +3,7 @@ import torch.nn as nn
 import functools
 from torch.autograd import Variable
 import numpy as np
-from functions import weights_init, get_norm_layer
+from mlops.src.components.functions import weights_init, get_norm_layer
 
 def define_D(input_nc, ndf, n_layers_D, norm='instance', use_sigmoid=False, num_D=1, getIntermFeat=False, gpu_ids=[], num_outputs=1):        
     norm_layer = get_norm_layer(norm_type=norm)   
