@@ -1,7 +1,9 @@
 import random
+
 import torch
 
-class ReplayPool():
+
+class ReplayPool:
     """
     This class implements a buffer that stores previously generated data.
 
@@ -14,7 +16,7 @@ class ReplayPool():
         self.data = []
 
     def query(self, fake_data):
-        assert(isinstance(fake_data, dict))
+        assert isinstance(fake_data, dict)
         if self.poolSize == 0:  # if the buffer size is 0, do nothing
             return fake_data
         result = []
@@ -23,7 +25,9 @@ class ReplayPool():
             if batch_size is None:
                 batch_size = fake_data[k].shape[0]
                 continue
-            assert(fake_data[k].shape[0] == batch_size)
+            assert fake_data[k].shape[0] == batch_size
+        if batch_size is None:
+            return fake_data
         for idx in range(batch_size):
             rec = {}
             for k in fake_data:
@@ -41,8 +45,8 @@ class ReplayPool():
             result.append(random_rec)
         result_ = {}
         for k in fake_data:
-            l = []
+            list = []
             for rec in result:
-                l.append(rec[k])
-            result_[k] = torch.stack(l, 0) 
+                list.append(rec[k])
+            result_[k] = torch.stack(list, 0)
         return result_

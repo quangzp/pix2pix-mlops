@@ -1,4 +1,4 @@
-# Core ML 
+# Core ML
 torch>=2.0.0
 torchvision>=0.15.0
 pillow>=9.0.0
@@ -26,10 +26,7 @@ pytest-timeout==2.2.0
 
 # Code Quality
 ruff==0.1.9
-black==23.12.1
-isort==5.13.2
 mypy==1.8.0
-flake8>=5.0.0
 
 # Security
 bandit==1.7.6
@@ -43,7 +40,7 @@ mkdocs-material==9.5.3
 mkdocstrings[python]==0.24.0
 
 # Development utilities
-ipython==8.19.0
+ipython==8.18.1
 ipdb==0.13.13
 
 # Logging

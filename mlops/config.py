@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from omegaconf import OmegaConf
 
 CONFIG_PATH = Path(__file__).resolve().parents[1] / "configs" / "config.yaml"

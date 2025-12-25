@@ -1,12 +1,12 @@
-import shutil
 from pathlib import Path
+import shutil
 from typing import Optional
 
 from loguru import logger
+from omegaconf import OmegaConf
 from PIL import Image
 from tqdm import tqdm
 import typer
-from omegaconf import OmegaConf
 
 app = typer.Typer()
 

@@ -190,7 +190,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Hydra specific 
+# Hydra specific
 outputs/
 multirun/
 
@@ -200,6 +200,5 @@ multirun/
 *.ckpt
 *.h5
 
-# IDE specific 
+# IDE specific
 .vscode/
-

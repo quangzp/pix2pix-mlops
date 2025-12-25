@@ -1,7 +1,8 @@
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
-@hydra.main(version_base=None, config_path="mlops/config",config_name="config")
+
+@hydra.main(version_base=None, config_path="mlops/config", config_name="config")
 def test_config(cfg: DictConfig):
     print("Main Config")
     print(f"Project: {cfg.project_name}")
@@ -44,7 +45,7 @@ def test_config(cfg: DictConfig):
         print("Done Training Config")
     except Exception as e:
         print(f"Training config error: {e}")
-    
+
     print("Params Config")
     try:
         metrics_count = len(cfg.params.metrics)
@@ -52,7 +53,7 @@ def test_config(cfg: DictConfig):
         print("Done Params Config")
     except Exception as e:
         print(f"Params config error: {e}")
-    
+
     loaded = 0
     total = 5
 
@@ -68,8 +69,8 @@ def test_config(cfg: DictConfig):
         try:
             check_func()
             loaded += 1
-        except:
-            pass
+        except Exception as e:
+            print(f"Error loading {name} config: {e}")
 
     print(f"Loaded {loaded}/{total} config sections successfully.")
 
@@ -77,6 +78,7 @@ def test_config(cfg: DictConfig):
         print("All config sections loaded successfully.")
     else:
         print(f"Some config sections failed to load. {total - loaded} configs missing")
+
 
 if __name__ == "__main__":
     test_config()

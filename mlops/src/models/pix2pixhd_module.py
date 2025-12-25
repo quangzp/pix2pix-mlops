@@ -1,10 +1,12 @@
 import pytorch_lightning as pl
-import torch
-from torch import nn
+
 
 class Pix2PixLitModule(pl.LightningModule):
-    def __init__():
-        #todo
+    def __init__(self):
+        super().__init__()
+        # todo
+        print("")
+
     def forward(self, x):
-        #todo
-    
+        # todo
+        print("")

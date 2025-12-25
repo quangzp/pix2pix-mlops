@@ -30,7 +30,7 @@ logging:
   log_gradients: false
 
 # Hardware config
-device: "mps" # cuda 
+device: "mps" # cuda
 num_workers: 4
 pin_memory: true
 
