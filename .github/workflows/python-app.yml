@@ -36,9 +36,7 @@ jobs:
     # Lint & Format
     - name: Lint and Format with Ruff
       run: |
-        # Kiểm tra lỗi logic (tương đương flake8 cũ)
         ruff check .
-        # Kiểm tra định dạng (tương đương black cũ)
         ruff format --check .
 
     # Unit Test

@@ -1,20 +1,19 @@
 dataset:
-  name: "sketch2image"
+  name: sketch2image
+  raw_dir: data/raw
+  processed_sketch_dir: data/processed/sketches
+  processed_image_dir: data/processed/images
   image_size: 256
-  sketch_ext: ".jpg"
-  image_ext: ".jpg"
+  sketch_ext: .jpg
+  image_ext: .jpg
   resize: 256
   clean_processed: true
   batch_size: 4
   num_workers: 4
   pin_memory: true
-
-  # Data splits
   train_split: 0.8
   val_split: 0.1
   test_split: 0.1
-
-  # Augmentation
   augmentation:
     enable: true
     horizontal_flip: 0.5

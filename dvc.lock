@@ -1,0 +1,29 @@
+schema: '2.0'
+stages:
+  process_data:
+    cmd: python mlops/data_processing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 80a61673a2bc7ad32d115dc6b3499a85.dir
+      size: 7336961
+      nfiles: 960
+    - path: mlops/config/dataset.yaml
+      hash: md5
+      md5: 845e795153e26ddca9c82e1370ee19ad
+      size: 454
+    - path: mlops/data_processing.py
+      hash: md5
+      md5: 73e670913c249ba16dd119e307a26239
+      size: 2166
+    outs:
+    - path: data/processed/images
+      hash: md5
+      md5: 543c887d221adad2bf9d8b4b98099a4f.dir
+      size: 1310659
+      nfiles: 200
+    - path: data/processed/sketches
+      hash: md5
+      md5: c7ae0ab1733e377007d628cef4981195.dir
+      size: 1742542
+      nfiles: 200

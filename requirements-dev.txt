@@ -45,3 +45,6 @@ ipdb==0.13.13
 
 # Logging
 loguru>=0.6.0
+
+# kaggle
+kagglehub

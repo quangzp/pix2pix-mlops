@@ -4,7 +4,10 @@ stages:
     deps:
       - data/raw
       - mlops/data_processing.py
-      - data/processed
+      - mlops/config/dataset.yaml
+    outs:
+      - data/processed/sketches
+      - data/processed/images
 
   train:
     cmd: python mlops/modeling/train.py training.num_epochs=10
