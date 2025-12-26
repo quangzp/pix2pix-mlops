@@ -1,30 +1,25 @@
 from pathlib import Path
 
+import hydra
 from loguru import logger
+from omegaconf import DictConfig
 from tqdm import tqdm
-import typer
-
-from mlops.config import MODELS_DIR, PROCESSED_DATA_DIR
-
-app = typer.Typer()
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
+@hydra.main(config_path="../config", config_name="config", version_base=None)
+def main(cfg: DictConfig):
+    features_path = Path(cfg.paths.processed) / "features.csv"
+    labels_path = Path(cfg.paths.processed) / "labels.csv"
+    model_path = Path(cfg.paths.models) / "model.pkl"
+
     logger.info("Training some model...")
+    logger.info(f"Features: {features_path} | Labels: {labels_path} | Model: {model_path}")
+
     for i in tqdm(range(10), total=10):
         if i == 5:
             logger.info("Something happened for iteration 5.")
     logger.success("Modeling training complete.")
-    # -----------------------------------------
 
 
 if __name__ == "__main__":
-    app()
+    main()

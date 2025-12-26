@@ -1,7 +1,8 @@
-from functions import get_norm_layer, weights_init
 import numpy as np
 import torch
 import torch.nn as nn
+
+from mlops.src.components.functions import get_norm_layer, weights_init
 
 
 def define_D(
