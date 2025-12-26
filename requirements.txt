@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Core ML
 torch>=2.0.0
 torchvision>=0.15.0
@@ -51,42 +50,4 @@ loguru>=0.6.0
 kagglehub
 
 # Install package in editable mode
-=======
-# Core ML/DL Framework
-torch>=2.0.0
-torchvision>=0.15.0
-pytorch-lightning>=2.0.0
-numpy>=1.23.0
-
-# Image Processing
-opencv-python>=4.8.0
-pillow>=10.0.0
-
-# Data Processing
-pandas>=2.0.0
-PyYAML>=6.0
-
-# Utilities & CLI
-loguru>=0.7.0
-tqdm>=4.65.0
-typer>=0.9.0
-python-dotenv>=1.0.0
-
-# Development Tools
-pytest>=7.4.0
-pytest-cov>=4.1.0
-black>=23.7.0
-ruff>=0.1.0
-mypy>=1.5.0
-
-# Documentation
-mkdocs>=1.5.0
-mkdocs-material>=9.1.0
-
-# Monitoring & Logging
-tensorboard>=2.13.0
-
-matplotlib>=3.8.0
-# Local package
->>>>>>> 429de4b36de2ea62783b9f613c87005afbaf8799
 -e .
