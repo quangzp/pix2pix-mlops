@@ -3,6 +3,7 @@ from typing import Optional
 
 import hydra
 from loguru import logger
+import mlflow
 from omegaconf import DictConfig
 import torch
 
@@ -158,31 +159,40 @@ def main(cfg: DictConfig):
             logger.success("Checkpoint loaded")
 
         # ---- Training loop ----
-        logger.info("=" * 80)
-        logger.info("Starting training loop")
-        logger.info("=" * 80)
+        mlflow.set_experiment(cfg.experiment.name)
+        with mlflow.start_run():
+            mlflow.log_param("num_epochs", num_epochs)
+            mlflow.log_param("batch_size", batch_size)
+            mlflow.log_param("learning_rate", learning_rate)
+            mlflow.log_param("ngf", ngf)
+            mlflow.log_param("ndf", ndf)
+            logger.info("=" * 80)
+            logger.info("Starting training loop")
+            logger.info("=" * 80)
 
-        for epoch in range(start_epoch, num_epochs):
-            logger.info(f"\nEpoch {epoch + 1}/{num_epochs}")
+            for epoch in range(start_epoch, num_epochs):
+                logger.info(f"\nEpoch {epoch + 1}/{num_epochs}")
 
-            try:
-                model.train_epoch(
-                    train_loader=train_loader,
-                    test_loader=test_loader,
-                    epoch=epoch,
-                    g_optimizer=g_optimizer,
-                    d_optimizer=d_optimizer,
-                )
-                logger.success(f"Epoch {epoch + 1} completed")
+                try:
+                    model.train_epoch(
+                        train_loader=train_loader,
+                        test_loader=test_loader,
+                        epoch=epoch,
+                        g_optimizer=g_optimizer,
+                        d_optimizer=d_optimizer,
+                    )
+                    for k, v in model.loss_log.items():
+                        mlflow.log_metric(k, v / len(train_loader), step=epoch)
+                    logger.success(f"Epoch {epoch + 1} completed")
 
-            except Exception as e:
-                logger.error(f"Error during epoch {epoch + 1}: {str(e)}")
-                raise
+                except Exception as e:
+                    logger.error(f"Error during epoch {epoch + 1}: {str(e)}")
+                    raise
 
-        logger.info("=" * 80)
-        logger.success("Training completed successfully!")
-        logger.info(f"Checkpoints saved to: {checkpoint_dir}")
-        logger.info("=" * 80)
+            logger.info("=" * 80)
+            logger.success("Training completed successfully!")
+            logger.info(f"Checkpoints saved to: {checkpoint_dir}")
+            logger.info("=" * 80)
 
     except Exception as e:
         logger.error(f"Training failed: {str(e)}")
