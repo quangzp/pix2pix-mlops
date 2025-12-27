@@ -46,3 +46,11 @@ hydra:
     dir: outputs/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
   job:
     chdir: false
+
+# Wandb config
+logger:
+  wandb:
+    entity: "quangng9112ad-hanoi-university-of-science-and-technology"
+    project: "MLOps"
+    group: "experiment-1"
+    name: null

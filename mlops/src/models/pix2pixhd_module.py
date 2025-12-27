@@ -12,6 +12,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
+import wandb
 
 
 class Pix2PixHDDataset(torch.utils.data.Dataset):
@@ -260,6 +261,15 @@ class Pix2PixHD(pl.LightningModule):
             out_file = os.path.join(self.checkpoint_dir, "images", f"{epoch}_{iteration}.jpg")
             cv2.imwrite(out_file, matrix)
 
+            try:
+                matrix_rgb = cv2.cvtColor(matrix, cv2.COLOR_BGR2RGB)
+
+                wandb.log(
+                    {"generated_examples": [wandb.Image(matrix_rgb, caption=f"Epoch {epoch}")]}
+                )
+            except Exception:
+                pass
+
     def save_checkpoint(self, epoch: int):
         """
         Save model checkpoint.
@@ -348,7 +358,7 @@ class Pix2PixHD(pl.LightningModule):
                     self.test_step(test_loader, epoch, N + i)
 
             # Update progress bar
-            txt = " | ".join([f"{k}: {self.loss_log[k]/N:.3e}" for k in self.loss_log])
+            txt = " | ".join([f"{k}: {self.loss_log[k] / N:.3e}" for k in self.loss_log])
             pbar.set_description(txt)
 
             # Save checkpoint
