@@ -2,11 +2,11 @@ from pathlib import Path
 from typing import Optional
 
 import hydra
+from loguru import logger
 import mlflow
+from omegaconf import DictConfig, OmegaConf
 import torch
 import wandb
-from loguru import logger
-from omegaconf import DictConfig, OmegaConf
 
 from mlops.src.components.discriminator import define_D
 from mlops.src.components.generator import define_G
@@ -173,7 +173,7 @@ def main(cfg: DictConfig):
             group=cfg.logger.wandb.group,
             name=cfg.logger.wandb.name,
             config=wandb_config,
-            job_type="training"
+            job_type="training",
         )
 
         run_url = run.get_url()

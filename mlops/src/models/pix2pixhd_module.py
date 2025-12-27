@@ -263,10 +263,10 @@ class Pix2PixHD(pl.LightningModule):
 
             try:
                 matrix_rgb = cv2.cvtColor(matrix, cv2.COLOR_BGR2RGB)
-                
-                wandb.log({
-                    "generated_examples": [wandb.Image(matrix_rgb, caption=f"Epoch {epoch}")]
-                })
+
+                wandb.log(
+                    {"generated_examples": [wandb.Image(matrix_rgb, caption=f"Epoch {epoch}")]}
+                )
             except Exception:
                 pass
 
@@ -358,7 +358,7 @@ class Pix2PixHD(pl.LightningModule):
                     self.test_step(test_loader, epoch, N + i)
 
             # Update progress bar
-            txt = " | ".join([f"{k}: {self.loss_log[k]/N:.3e}" for k in self.loss_log])
+            txt = " | ".join([f"{k}: {self.loss_log[k] / N:.3e}" for k in self.loss_log])
             pbar.set_description(txt)
 
             # Save checkpoint
