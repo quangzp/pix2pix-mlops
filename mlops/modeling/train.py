@@ -6,6 +6,8 @@ from loguru import logger
 import mlflow
 from omegaconf import DictConfig
 import torch
+import wandb
+from omegaconf import OmegaConf 
 
 from mlops.src.components.discriminator import define_D
 from mlops.src.components.generator import define_G
@@ -159,7 +161,28 @@ def main(cfg: DictConfig):
             logger.success("Checkpoint loaded")
 
         # ---- Training loop ----
+        # 1. Setup MLflow
         mlflow.set_experiment(cfg.experiment.name)
+        
+        # 2. Setup WandB 
+        wandb_config = OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True)
+        
+        # Khởi tạo run
+        run = wandb.init(
+            entity=cfg.logger.wandb.entity,
+            project=cfg.logger.wandb.project,
+            group=cfg.logger.wandb.group,
+            name=cfg.logger.wandb.name,
+            config=wandb_config,
+            job_type="training"
+        )
+
+        run_url = run.get_url()
+        
+        logger.info("=" * 80)
+        logger.success(f"🚀 WANDB DASHBOARD IS LIVE AT: {run_url}")
+        logger.info("=" * 80)
+
         with mlflow.start_run():
             mlflow.log_param("num_epochs", num_epochs)
             mlflow.log_param("batch_size", batch_size)
@@ -181,18 +204,31 @@ def main(cfg: DictConfig):
                         g_optimizer=g_optimizer,
                         d_optimizer=d_optimizer,
                     )
+                    
+                    # 1. Log for MLflow
                     for k, v in model.loss_log.items():
                         mlflow.log_metric(k, v / len(train_loader), step=epoch)
+                    
+                    # 2. Log for WandB
+                    wandb_metrics = {k: v / len(train_loader) for k, v in model.loss_log.items()}
+                    wandb_metrics["epoch"] = epoch
+                    
+                    wandb.log(wandb_metrics)
+
                     logger.success(f"Epoch {epoch + 1} completed")
 
                 except Exception as e:
                     logger.error(f"Error during epoch {epoch + 1}: {str(e)}")
+                    wandb.finish() 
                     raise
 
             logger.info("=" * 80)
             logger.success("Training completed successfully!")
             logger.info(f"Checkpoints saved to: {checkpoint_dir}")
             logger.info("=" * 80)
+            
+            # End Wandb run
+            wandb.finish()
 
     except Exception as e:
         logger.error(f"Training failed: {str(e)}")

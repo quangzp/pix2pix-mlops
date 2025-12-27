@@ -11,7 +11,7 @@ python-dotenv>=1.0.0
 # MLOps
 mlflow>=2.0.0
 dvc>=2.0.0
-wandb
+wandb>=0.15.0
 
 # Data processing
 pandas>=2.0.0
