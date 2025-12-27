@@ -1,6 +1,6 @@
 dataset:
   name: sketch2image
-  raw_dir: data/raw
+  raw_dir: data/raw/original
   processed_sketch_dir: data/processed/sketches
   processed_image_dir: data/processed/images
   image_size: 256

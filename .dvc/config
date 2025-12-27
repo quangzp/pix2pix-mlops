@@ -1,5 +1,9 @@
 [core]
     autostage = true
-    remote = storage
+    remote = r2remote
 ['remote "storage"']
     url = D:\GENAI\K1\MLOPS\dvc-http-storage\data
+['remote "r2remote"']
+    url = s3://mlopsstorage/
+    endpointurl = https://3add84ad4b2602314a1d274516cded3d.r2.cloudflarestorage.com
+    region = auto

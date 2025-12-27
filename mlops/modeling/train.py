@@ -1,7 +1,9 @@
+import json
 from pathlib import Path
 from typing import Optional
 
 import hydra
+from hydra.utils import get_original_cwd
 from loguru import logger
 import mlflow
 from omegaconf import DictConfig, OmegaConf
@@ -18,31 +20,37 @@ from mlops.src.models.pix2pixhd_module import Pix2PixHD, Pix2PixHDDataset
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
     # ---- Dataset paths ----
-    dataset_path: Path = Path(cfg.paths.raw)
-    feature_folder = cfg.dataset.processed_sketch_dir
-    label_folder = cfg.dataset.raw_dir
+    project_root = Path(get_original_cwd())
+    dataset_path = project_root / cfg.paths.raw
+    feature_folder = str(project_root / cfg.dataset.processed_sketch_dir)
+    label_folder = str(project_root / cfg.dataset.processed_image_dir)
+    images_dir = str(project_root / "data/processed/")
     # ---- Model configuration ----
-    checkpoint_dir: Path = Path(cfg.checkpoints.dir)
+    checkpoint_dir: Path = project_root / "models" / "checkpoints"
     num_epochs: int = cfg.training.num_epochs
     batch_size: int = cfg.training.batch_size
     # ---- Generator config ----
-    ngf = cfg.model.generator_channels
-    n_downsample_global: int = cfg.generator.n_downsample_global
-    n_blocks_global: int = cfg.generator.n_blocks_global
-    n_local_enhancers: int = cfg.generator.n_local_enhancers
-    n_blocks_local: int = cfg.generator.n_blocks_local
+    ngf = cfg.model.generator.ngf
+    n_downsample_global: int = cfg.model.generator.n_downsampling
+    n_blocks_global: int = cfg.model.generator.n_blocks
+    n_local_enhancers: int = cfg.model.generator.get(
+        "n_local_enhancers", 1
+    )  # hoặc giá trị mặc định nếu không có
+    n_blocks_local: int = cfg.model.generator.get(
+        "n_blocks_local", 3
+    )  # hoặc giá trị mặc định nếu không có
     # ---- Discriminator config ----
     ndf = cfg.model.discriminator_channels
-    n_layers_D: int = cfg.discriminator.n_layers_D
-    num_D: int = cfg.discriminator.num_D
+    n_layers_D: int = cfg.model.discriminator.n_layers
+    num_D: int = cfg.model.discriminator.num_D
     # ---- Training config ----
     learning_rate: float = cfg.training.learning_rate
     lambda_feat: float = cfg.training.lambda_feat
     replay_pool_size: int = cfg.training.replay_pool_size
     # ema_decay: float = cfg.training.ema_decay
     # ---- Data config ----
-    img_size: int = cfg.data.img_size
-    num_workers: int = cfg.data.num_workers
+    img_size: int = cfg.dataset.image_size
+    num_workers: int = cfg.dataset.num_workers
     # ---- Training control ----
     # test_interval: int = cfg.training.test_interval
     # save_interval: int = cfg.training.save_interval
@@ -67,10 +75,13 @@ def main(cfg: DictConfig):
     try:
         # ---- Create dataset and dataloaders ----
         logger.info(f"Loading dataset from {dataset_path}")
+        logger.info(f"Images directory: {images_dir}")
+        logger.info(f"Feature folder: {feature_folder}")
+        logger.info(f"Label folder: {label_folder}")
         train_dataset = Pix2PixHDDataset(
-            images_dir=str(dataset_path),
-            feature_fold=feature_folder,
-            label_fold=label_folder,
+            images_dir=images_dir,
+            feature_fold="sketches/",
+            label_fold="images/",
             img_size=img_size,
         )
         logger.info(f"Dataset size: {len(train_dataset)}")
@@ -225,6 +236,16 @@ def main(cfg: DictConfig):
             logger.success("Training completed successfully!")
             logger.info(f"Checkpoints saved to: {checkpoint_dir}")
             logger.info("=" * 80)
+
+            # Save metrics
+            metrics = {
+                "final_g_loss": float(model.loss_log.get("G_adv", 0)),
+                "final_d_loss": float(model.loss_log.get("D_true", 0)),
+            }
+            metrics_path = project_root / "reports" / "metrics.json"
+            metrics_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(metrics_path, "w") as f:
+                json.dump(metrics, f)
 
             # End Wandb run
             wandb.finish()

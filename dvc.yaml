@@ -1,23 +1,13 @@
 stages:
-  process_data:
-    cmd: python mlops/data_processing.py
-    deps:
-      - data/raw
-      - mlops/data_processing.py
-      - mlops/config/dataset.yaml
-    outs:
-      - data/processed/sketches
-      - data/processed/images
-
   train:
     cmd: python mlops/modeling/train.py training.num_epochs=10
     deps:
-      - data/processed
-      - mlops/modeling/train.py
-      - mlops/config/
+    - data/processed
+    - mlops/modeling/train.py
+    - mlops/config/
     outs:
-      - models/
-      - outputs/
+    - models/
+    - outputs/
     metrics:
-      - reports/metrics.json:
-          cache: false
+    - reports/metrics.json:
+        cache: false

@@ -32,7 +32,7 @@ class Pix2PixHDDataset(torch.utils.data.Dataset):
             [transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
         )
         self.imagesDir = images_dir
-        self.images = glob(images_dir + feature_fold + "*.jpg")
+        self.images = glob(os.path.join(images_dir, feature_fold, "*.jpg"))
         self.feature_fold = feature_fold
         self.label_fold = label_fold
         self.img_size = img_size
