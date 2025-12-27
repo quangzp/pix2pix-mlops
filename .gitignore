@@ -199,3 +199,16 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Hydra specific
+outputs/
+multirun/
+
+# MLOps specific
+*.pth
+*.pt
+*.ckpt
+*.h5
+
+# IDE specific
+.vscode/

@@ -1,5 +1,24 @@
-defaults:
-  - paths
-  - dataset
-  - model
-  - training
+params:
+  # Metrics to track
+  metrics:
+    - name: "fid"
+      description: "Frechet Inception Distance"
+    - name: "ssim"
+      description: "Structural Similarity Index"
+    - name: "psnr"
+      description: "Peak Signal-to-Noise Ratio"
+    - name: "lpips"
+      description: "Learned Perceptual Image Patch Similarity"
+    - name: "l1_loss"
+      description: "L1 Loss"
+    - name: "gan_loss"
+      description: "GAN Loss"
+    - name: "perceptual_loss"
+      description: "Perceptual Loss"
+
+  # Hyperparameters for tuning
+  hyperparameters:
+    learning_rate: [0.0001, 0.0002, 0.0004]
+    batch_size: [4, 8, 16]
+    ngf: [32, 64, 128]
+    ndf: [32, 64, 128]

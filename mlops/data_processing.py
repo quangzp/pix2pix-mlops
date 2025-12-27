@@ -1,21 +1,12 @@
-import shutil
 from pathlib import Path
+import shutil
 from typing import Optional
 
+import hydra
 from loguru import logger
+from omegaconf import DictConfig
 from PIL import Image
 from tqdm import tqdm
-import typer
-from omegaconf import OmegaConf
-
-app = typer.Typer()
-
-
-def load_config(config_path: Path):
-    """Load OmegaConf YAML config."""
-    cfg = OmegaConf.load(config_path)
-    logger.info(f"Loaded config from {config_path}")
-    return cfg
 
 
 def process_image(input_path: Path, output_path: Path, size: Optional[int] = None):
@@ -37,11 +28,8 @@ def process_image(input_path: Path, output_path: Path, size: Optional[int] = Non
         return False
 
 
-@app.command()
-def main(config: Path = typer.Option(..., help="Path to dataset config YAML")):
-    """Run dataset processing pipeline."""
-    cfg = load_config(config)
-
+@hydra.main(version_base=None, config_path="config", config_name="config")
+def main(cfg: DictConfig):
     raw_data = Path(cfg.dataset.raw_dir)
     processed_sketch = Path(cfg.dataset.processed_sketch_dir)
     processed_image = Path(cfg.dataset.processed_image_dir)
@@ -80,4 +68,4 @@ def main(config: Path = typer.Option(..., help="Path to dataset config YAML")):
 
 
 if __name__ == "__main__":
-    app()
+    main()

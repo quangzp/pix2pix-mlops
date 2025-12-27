@@ -1,16 +1,29 @@
 from pathlib import Path
-from omegaconf import OmegaConf
 
-CONFIG_PATH = Path(__file__).resolve().parents[1] / "configs" / "config.yaml"
+import hydra
+from omegaconf import DictConfig
 
-cfg = OmegaConf.load(CONFIG_PATH)
 
-# Expose shortcuts
-RAW_DATA_DIR = Path(cfg.paths.raw)
-PROCESSED_DATA_DIR = Path(cfg.paths.processed)
-INTERIM_DATA_DIR = Path(cfg.paths.interim)
-MODELS_DIR = Path(cfg.paths.models)
+@hydra.main(config_path="mlops/config", config_name="config", version_base=None)
+def main(cfg: DictConfig):
+    # Expose shortcuts
+    raw_data_dir = Path(cfg.paths.raw)
+    processed_data_dir = Path(cfg.paths.processed)
+    interim_data_dir = Path(cfg.paths.interim)
+    models_dir = Path(cfg.paths.models)
 
-DATASET_CFG = cfg.dataset
-TRAINING_CFG = cfg.training
-MODEL_CFG = cfg.model
+    dataset_cfg = cfg.dataset
+    training_cfg = cfg.training
+    model_cfg = cfg.model
+
+    print("Raw data dir:", raw_data_dir)
+    print("Processed data dir:", processed_data_dir)
+    print("Models dir:", models_dir)
+    print("Dataset config:", dataset_cfg)
+    print("Training config:", training_cfg)
+    print("Model config:", model_cfg)
+    print("Interim data dir:", interim_data_dir)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,28 @@
 model:
   name: "pix2pix"
+  type: "gan"
   generator_channels: 64
   discriminator_channels: 64
+
+  # Generator configuration
+  generator:
+    name: "unet"
+    ngf: 64
+    n_downsampling: 3
+    n_blocks: 9
+    norm_layer: "instance"
+    use_dropout: false
+
+  # Discriminator configuration
+  discriminator:
+    name: "patchgan"
+    ndf: 64
+    ngf: 64
+    n_layers: 3
+    norm_layer: "instance"
+
+  # Loss weights
+  loss_weights:
+    gan: 1.0
+    l1: 100.0
+    perceptual: 10.0

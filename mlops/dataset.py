@@ -1,17 +1,17 @@
 import os
 from pathlib import Path
-from torch.utils.data import DataLoader
-import torch
+
 from PIL import Image
+import torch
+from torch.utils.data import DataLoader
 
 
 class Dataset(torch.utils.data.Dataset):
-   
     def __init__(self, root_dir, split="train", transform=None):
         self.root_dir = Path(root_dir)
         self.split = split
         self.transform = transform
-        
+
         self.sketch_dir = self.root_dir / split / "sketch"
         self.real_dir = self.root_dir / split / "photo"
 
@@ -37,18 +37,10 @@ class Dataset(torch.utils.data.Dataset):
 
 
 def create_dataloader(root_dir, split, batch_size, transform, shuffle=True):
-    dataset = Dataset(
-        root_dir=root_dir,
-        split=split,
-        transform=transform
-    )
+    dataset = Dataset(root_dir=root_dir, split=split, transform=transform)
 
     dataloader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        num_workers=4,
-        pin_memory=True
+        dataset, batch_size=batch_size, shuffle=shuffle, num_workers=4, pin_memory=True
     )
 
     return dataloader
