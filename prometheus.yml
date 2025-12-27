@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'remote_server' # Tên máy bạn muốn theo dõi
+    static_configs:
+      - targets: ['100.123.221.111:9100'] # Thay IP_MAY_B bằng IP thật của máy cần tracking
