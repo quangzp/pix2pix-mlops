@@ -1,9 +1,11 @@
 from pathlib import Path
 from typing import Optional
 
+import hydra
 from loguru import logger
+import mlflow
+from omegaconf import DictConfig
 import torch
-import typer
 
 from mlops.src.components.discriminator import define_D
 from mlops.src.components.generator import define_G
@@ -11,44 +13,40 @@ from mlops.src.components.losses import GANLoss, VGGLoss
 from mlops.src.components.replay_pool import ReplayPool
 from mlops.src.models.pix2pixhd_module import Pix2PixHD, Pix2PixHDDataset
 
-app = typer.Typer()
 
-
-@app.command()
-def main(
+@hydra.main(config_path="../config", config_name="config", version_base=None)
+def main(cfg: DictConfig):
     # ---- Dataset paths ----
-    dataset_path: Path = typer.Option(Path("./data/raw/face"), help="Root dataset directory"),
-    feature_folder: str = typer.Option("/sketches/", help="Subfolder containing input images"),
-    label_folder: str = typer.Option("/photos/", help="Subfolder containing target images"),
+    dataset_path: Path = Path(cfg.paths.raw)
+    feature_folder = cfg.dataset.processed_sketch_dir
+    label_folder = cfg.dataset.raw_dir
     # ---- Model configuration ----
-    checkpoint_dir: Path = typer.Option(
-        Path("./checkpoints"), help="Directory to save checkpoints"
-    ),
-    num_epochs: int = typer.Option(10, help="Number of training epochs"),
-    batch_size: int = typer.Option(4, help="Batch size for training"),
+    checkpoint_dir: Path = Path(cfg.checkpoints.dir)
+    num_epochs: int = cfg.training.num_epochs
+    batch_size: int = cfg.training.batch_size
     # ---- Generator config ----
-    ngf: int = typer.Option(64, help="Number of generator filters"),
-    n_downsample_global: int = typer.Option(3, help="Number of global downsampling layers"),
-    n_blocks_global: int = typer.Option(9, help="Number of global residual blocks"),
-    n_local_enhancers: int = typer.Option(1, help="Number of local enhancers"),
-    n_blocks_local: int = typer.Option(3, help="Number of local residual blocks"),
+    ngf = cfg.model.generator_channels
+    n_downsample_global: int = cfg.generator.n_downsample_global
+    n_blocks_global: int = cfg.generator.n_blocks_global
+    n_local_enhancers: int = cfg.generator.n_local_enhancers
+    n_blocks_local: int = cfg.generator.n_blocks_local
     # ---- Discriminator config ----
-    ndf: int = typer.Option(64, help="Number of discriminator filters"),
-    n_layers_D: int = typer.Option(3, help="Number of discriminator layers"),
-    num_D: int = typer.Option(3, help="Number of discriminators (multi-scale)"),
+    ndf = cfg.model.discriminator_channels
+    n_layers_D: int = cfg.discriminator.n_layers_D
+    num_D: int = cfg.discriminator.num_D
     # ---- Training config ----
-    learning_rate: float = typer.Option(1e-4, help="Learning rate for optimizers"),
-    lambda_feat: float = typer.Option(10.0, help="Weight for feature matching loss"),
-    replay_pool_size: int = typer.Option(50, help="Size of replay buffer"),
-    ema_decay: float = typer.Option(0.9999, help="EMA decay rate for generator"),
+    learning_rate: float = cfg.training.learning_rate
+    lambda_feat: float = cfg.training.lambda_feat
+    replay_pool_size: int = cfg.training.replay_pool_size
+    # ema_decay: float = cfg.training.ema_decay
     # ---- Data config ----
-    img_size: int = typer.Option(256, help="Image size for training"),
-    num_workers: int = typer.Option(4, help="Number of data loading workers"),
+    img_size: int = cfg.data.img_size
+    num_workers: int = cfg.data.num_workers
     # ---- Training control ----
-    test_interval: int = typer.Option(100, help="Test image generation interval (iterations)"),
-    save_interval: int = typer.Option(1000, help="Checkpoint save interval (iterations)"),
-    resume_from: Optional[Path] = typer.Option(None, help="Path to checkpoint to resume from"),
-):
+    # test_interval: int = cfg.training.test_interval
+    # save_interval: int = cfg.training.save_interval
+    resume_from: Optional[Path] = cfg.training.resume_from
+
     """
     Train Pix2PixHD model for image-to-image translation.
 
@@ -161,31 +159,40 @@ def main(
             logger.success("Checkpoint loaded")
 
         # ---- Training loop ----
-        logger.info("=" * 80)
-        logger.info("Starting training loop")
-        logger.info("=" * 80)
+        mlflow.set_experiment(cfg.experiment.name)
+        with mlflow.start_run():
+            mlflow.log_param("num_epochs", num_epochs)
+            mlflow.log_param("batch_size", batch_size)
+            mlflow.log_param("learning_rate", learning_rate)
+            mlflow.log_param("ngf", ngf)
+            mlflow.log_param("ndf", ndf)
+            logger.info("=" * 80)
+            logger.info("Starting training loop")
+            logger.info("=" * 80)
 
-        for epoch in range(start_epoch, num_epochs):
-            logger.info(f"\nEpoch {epoch + 1}/{num_epochs}")
+            for epoch in range(start_epoch, num_epochs):
+                logger.info(f"\nEpoch {epoch + 1}/{num_epochs}")
 
-            try:
-                model.train_epoch(
-                    train_loader=train_loader,
-                    test_loader=test_loader,
-                    epoch=epoch,
-                    g_optimizer=g_optimizer,
-                    d_optimizer=d_optimizer,
-                )
-                logger.success(f"Epoch {epoch + 1} completed")
+                try:
+                    model.train_epoch(
+                        train_loader=train_loader,
+                        test_loader=test_loader,
+                        epoch=epoch,
+                        g_optimizer=g_optimizer,
+                        d_optimizer=d_optimizer,
+                    )
+                    for k, v in model.loss_log.items():
+                        mlflow.log_metric(k, v / len(train_loader), step=epoch)
+                    logger.success(f"Epoch {epoch + 1} completed")
 
-            except Exception as e:
-                logger.error(f"Error during epoch {epoch + 1}: {str(e)}")
-                raise
+                except Exception as e:
+                    logger.error(f"Error during epoch {epoch + 1}: {str(e)}")
+                    raise
 
-        logger.info("=" * 80)
-        logger.success("Training completed successfully!")
-        logger.info(f"Checkpoints saved to: {checkpoint_dir}")
-        logger.info("=" * 80)
+            logger.info("=" * 80)
+            logger.success("Training completed successfully!")
+            logger.info(f"Checkpoints saved to: {checkpoint_dir}")
+            logger.info("=" * 80)
 
     except Exception as e:
         logger.error(f"Training failed: {str(e)}")
@@ -193,4 +200,4 @@ def main(
 
 
 if __name__ == "__main__":
-    app()
+    main()
