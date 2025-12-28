@@ -1,12 +1,6 @@
 # 🎨 Pix2PixHD MLOps: High-Resolution Image Synthesis Pipeline
 
-![Python](https://img.shields.io/badge/python-3.10-blue.svg)
-![PyTorch Lightning](https://img.shields.io/badge/pytorch--lightning-2.0+-orange.svg)
-![DVC](https://img.shields.io/badge/data%20version%20control-DVC-9cf.svg)
-![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/pix2pix-mlops/ci.yaml?branch=main)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-> **Dự án xây dựng pipeline MLOps toàn diện cho mô hình Pix2PixHD (High-Definition Image-to-Image Translation), tập trung vào khả năng tái lập (Reproducibility), tự động hóa (Automation) và quy trình Hybrid Training (Local/Cloud).**
+> **Dự án xây dựng pipeline MLOps cho mô hình Pix2PixHD (High-Definition Image-to-Image Translation), tập trung vào khả năng tái lập (Reproducibility), tự động hóa (Automation) và quy trình Hybrid Training (Local/Cloud).**
 
 ---
 
@@ -17,7 +11,7 @@ Dự án này triển khai thuật toán **Pix2PixHD** (sử dụng *Global Gene
 Điểm đặc biệt của dự án không nằm ở thuật toán mới, mà ở việc **chuẩn hóa quy trình phát triển theo tiêu chuẩn MLOps**, giải quyết các vấn đề thực tế:
 * **Quản lý dữ liệu:** Xử lý versioning cho dữ liệu ảnh lớn bằng DVC.
 * **Module hóa:** Tách biệt code nghiên cứu (Notebooks) và code sản phẩm (`src`).
-* **Hybrid Training:** Phát triển trên local, huấn luyện trên Google Colab, và quản lý kết quả tập trung.
+* **Hybrid Training:** Phát triển trên local, huấn luyện trên server gpu, và quản lý kết quả tập trung.
 * **CI/CD:** Tự động kiểm tra lỗi code và tích hợp quy trình đóng gói.
 
 ---
@@ -140,7 +134,7 @@ python src/predict.py \
 
 # 🔄 Quy trình MLOps (Hybrid Workflow)
 
-Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên Cloud (Google Colab) để tối ưu chi phí và hiệu quả.
+Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên VPS GPU để tối ưu chi phí và hiệu quả.
 
 ## 🗺️ Sơ đồ tổng quan
 
@@ -171,4 +165,4 @@ graph TD
 ```
 
 ### 📊 Kết quả (Results)
-
+![Input Image](docs/docs/z7204701548610_15059adea9369f765cea5d54dd161d45.jpg)
