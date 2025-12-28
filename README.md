@@ -134,7 +134,7 @@ python src/predict.py \
 
 # 🔄 Quy trình MLOps (Hybrid Workflow)
 
-Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên Cloud (Google Colab) để tối ưu chi phí và hiệu quả.
+Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên VPS GPU để tối ưu chi phí và hiệu quả.
 
 ## 🗺️ Sơ đồ tổng quan
 
