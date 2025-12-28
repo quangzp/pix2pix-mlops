@@ -1,5 +1,5 @@
 training:
-  num_epochs: 100
+  num_epochs: 3
   batch_size: 16
   learning_rate: 0.0002
   device: "mps" # Change to cuda if using NVIDIA GPU
