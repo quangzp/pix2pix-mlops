@@ -91,14 +91,14 @@ Dự án tuân theo chuẩn `cookiecutter-data-science` đã được tùy biế
 
 --------
 
-## ⚡ Bắt đầu nhanh (Getting Started)
+## Getting Started
 
 ### 1. Cài đặt môi trường
 Khuyến khích sử dụng Conda để quản lý Python và CUDA:
 
 ```bash
 # Clone dự án
-git clone [https://github.com/yourusername/pix2pix-mlops.git](https://github.com/yourusername/pix2pix-mlops.git)
+git clone [https://github.com/quangzp/pix2pix-mlops.git](https://github.com/quangzp/pix2pix-mlops.git)
 cd pix2pix-mlops
 
 # Tạo môi trường ảo
@@ -108,4 +108,67 @@ conda activate pix2pix
 # Cài đặt thư viện
 pip install -r requirements.txt
 ```
+
+### 2. Chuẩn bị dữ liệu (DVC)
+
+```bash
+# Cấu hình xác thực, storage (nếu cần) và tải dữ liệu + model cũ (nếu có)
+dvc pull
+```
+
+### 3. Huấn luyện (Training)
+Chạy training với cấu hình mặc định hoặc tùy chỉnh qua Hydra mà không cần sửa code:
+```bash
+# Chạy mặc định (theo conf/config.yaml)
+python src/train.py
+
+# Chạy tùy chỉnh (Ví dụ: Train 200 epochs, batch size 4)
+python src/train.py train.max_epochs=200 data.batch_size=4
+
+# Chạy với WandB logging (cần login wandb trước)
+python src/train.py logger=wandb
+```
+
+### 4. Suy luận (Inference)
+Sinh ảnh từ model đã train:
+```bash
+python src/predict.py \
+    --ckpt_path models/best_model.ckpt \
+    --input_path data/test/sample_input.jpg \
+    --output_path results/generated.jpg
+```
+
+# 🔄 Quy trình MLOps (Hybrid Workflow)
+
+Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên Cloud (Google Colab) để tối ưu chi phí và hiệu quả.
+
+## 🗺️ Sơ đồ tổng quan
+
+```mermaid
+graph TD
+    subgraph Local_Dev [Máy Cá Nhân]
+        A[Viết Code / Config] -->|Git Push| B(GitHub Repo)
+        C[Dữ liệu Mới] -->|DVC Push| D(Storage)
+    end
+
+    subgraph CI_CD [GitHub Actions]
+        B -->|Pull Request| E{Chạy Test}
+        E -->|Pass| F[Merge vào Main]
+        E -->|Fail| A
+    end
+
+    subgraph Cloud_Training [VPS GPU]
+        F -->|Git Trigger Self-host runner| G[VPS]
+        D -->|DVC Pull| G
+        G -->|Train| H[Model Artifacts]
+        H -->|WandB Log| I(WandB Dashboard)
+        H -->|DVC Push| D
+    end
+
+    subgraph Versioning
+        G -->|Git Push .dvc| B
+    end
+```
+
+### 📊 Kết quả (Results)
 
