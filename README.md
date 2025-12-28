@@ -1,12 +1,6 @@
 # 🎨 Pix2PixHD MLOps: High-Resolution Image Synthesis Pipeline
 
-![Python](https://img.shields.io/badge/python-3.10-blue.svg)
-![PyTorch Lightning](https://img.shields.io/badge/pytorch--lightning-2.0+-orange.svg)
-![DVC](https://img.shields.io/badge/data%20version%20control-DVC-9cf.svg)
-![Build Status](https://img.shields.io/github/actions/workflow/status/yourusername/pix2pix-mlops/ci.yaml?branch=main)
-![License](https://img.shields.io/badge/license-MIT-green)
-
-> **Dự án xây dựng pipeline MLOps toàn diện cho mô hình Pix2PixHD (High-Definition Image-to-Image Translation), tập trung vào khả năng tái lập (Reproducibility), tự động hóa (Automation) và quy trình Hybrid Training (Local/Cloud).**
+> **Dự án xây dựng pipeline MLOps cho mô hình Pix2PixHD (High-Definition Image-to-Image Translation), tập trung vào khả năng tái lập (Reproducibility), tự động hóa (Automation) và quy trình Hybrid Training (Local/Cloud).**
 
 ---
 
@@ -17,7 +11,7 @@ Dự án này triển khai thuật toán **Pix2PixHD** (sử dụng *Global Gene
 Điểm đặc biệt của dự án không nằm ở thuật toán mới, mà ở việc **chuẩn hóa quy trình phát triển theo tiêu chuẩn MLOps**, giải quyết các vấn đề thực tế:
 * **Quản lý dữ liệu:** Xử lý versioning cho dữ liệu ảnh lớn bằng DVC.
 * **Module hóa:** Tách biệt code nghiên cứu (Notebooks) và code sản phẩm (`src`).
-* **Hybrid Training:** Phát triển trên local, huấn luyện trên Google Colab, và quản lý kết quả tập trung.
+* **Hybrid Training:** Phát triển trên local, huấn luyện trên server gpu, và quản lý kết quả tập trung.
 * **CI/CD:** Tự động kiểm tra lỗi code và tích hợp quy trình đóng gói.
 
 ---
@@ -91,14 +85,14 @@ Dự án tuân theo chuẩn `cookiecutter-data-science` đã được tùy biế
 
 --------
 
-## ⚡ Bắt đầu nhanh (Getting Started)
+## Getting Started
 
 ### 1. Cài đặt môi trường
 Khuyến khích sử dụng Conda để quản lý Python và CUDA:
 
 ```bash
 # Clone dự án
-git clone [https://github.com/yourusername/pix2pix-mlops.git](https://github.com/yourusername/pix2pix-mlops.git)
+git clone [https://github.com/quangzp/pix2pix-mlops.git](https://github.com/quangzp/pix2pix-mlops.git)
 cd pix2pix-mlops
 
 # Tạo môi trường ảo
@@ -109,3 +103,66 @@ conda activate pix2pix
 pip install -r requirements.txt
 ```
 
+### 2. Chuẩn bị dữ liệu (DVC)
+
+```bash
+# Cấu hình xác thực, storage (nếu cần) và tải dữ liệu + model cũ (nếu có)
+dvc pull
+```
+
+### 3. Huấn luyện (Training)
+Chạy training với cấu hình mặc định hoặc tùy chỉnh qua Hydra mà không cần sửa code:
+```bash
+# Chạy mặc định (theo conf/config.yaml)
+python src/train.py
+
+# Chạy tùy chỉnh (Ví dụ: Train 200 epochs, batch size 4)
+python src/train.py train.max_epochs=200 data.batch_size=4
+
+# Chạy với WandB logging (cần login wandb trước)
+python src/train.py logger=wandb
+```
+
+### 4. Suy luận (Inference)
+Sinh ảnh từ model đã train:
+```bash
+python src/predict.py \
+    --ckpt_path models/best_model.ckpt \
+    --input_path data/test/sample_input.jpg \
+    --output_path results/generated.jpg
+```
+
+# 🔄 Quy trình MLOps (Hybrid Workflow)
+
+Tài liệu này mô tả quy trình làm việc chuẩn cho dự án Pix2PixHD, kết hợp giữa môi trường phát triển cục bộ (Local) và huấn luyện trên VPS GPU để tối ưu chi phí và hiệu quả.
+
+## 🗺️ Sơ đồ tổng quan
+
+```mermaid
+graph TD
+    subgraph Local_Dev [Máy Cá Nhân]
+        A[Viết Code / Config] -->|Git Push| B(GitHub Repo)
+        C[Dữ liệu Mới] -->|DVC Push| D(Storage)
+    end
+
+    subgraph CI_CD [GitHub Actions]
+        B -->|Pull Request| E{Chạy Test}
+        E -->|Pass| F[Merge vào Main]
+        E -->|Fail| A
+    end
+
+    subgraph Cloud_Training [VPS GPU]
+        F -->|Git Trigger Self-host runner| G[VPS]
+        D -->|DVC Pull| G
+        G -->|Train| H[Model Artifacts]
+        H -->|WandB Log| I(WandB Dashboard)
+        H -->|DVC Push| D
+    end
+
+    subgraph Versioning
+        G -->|Git Push .dvc| B
+    end
+```
+
+### 📊 Kết quả (Results)
+![Input Image](docs/docs/z7204701548610_15059adea9369f765cea5d54dd161d45.jpg)
