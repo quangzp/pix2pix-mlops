@@ -171,4 +171,4 @@ graph TD
 ```
 
 ### 📊 Kết quả (Results)
-
+![Input Image](docs/docs/z7204701548610_15059adea9369f765cea5d54dd161d45.jpg)
