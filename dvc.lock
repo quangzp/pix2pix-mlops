@@ -1,29 +1,34 @@
 schema: '2.0'
 stages:
-  process_data:
-    cmd: python mlops/data_processing.py
+  train:
+    cmd: python mlops/modeling/train.py training.num_epochs=10
     deps:
-    - path: data/raw
+    - path: data/processed
       hash: md5
-      md5: 80a61673a2bc7ad32d115dc6b3499a85.dir
-      size: 7336961
-      nfiles: 960
-    - path: mlops/config/dataset.yaml
+      md5: 2e0eb23734e1cbf3e56171934a24cced.dir
+      size: 3255552
+      nfiles: 400
+    - path: mlops/config/
       hash: md5
-      md5: 4d5d455ac31f46116528c37aa46a2637
-      size: 455
-    - path: mlops/data_processing.py
+      md5: f6cbd9c4214828c8b223fd8dfd11d00c.dir
+      size: 3667
+      nfiles: 6
+    - path: mlops/modeling/train.py
       hash: md5
-      md5: 1631c0917aa3c40903a4dfce01f95115
-      size: 2166
+      md5: 0c2f9b795fb5bfe47e0ae6820a9a3a3e
+      size: 9743
     outs:
-    - path: data/processed/images
+    - path: models/
       hash: md5
-      md5: 543c887d221adad2bf9d8b4b98099a4f.dir
-      size: 1310659
-      nfiles: 200
-    - path: data/processed/sketches
+      md5: fb9aa001268792f30d1c9e89bca675e5.dir
+      size: 0
+      nfiles: 1
+    - path: outputs/
       hash: md5
-      md5: c7ae0ab1733e377007d628cef4981195.dir
-      size: 1742542
-      nfiles: 200
+      md5: fb9aa001268792f30d1c9e89bca675e5.dir
+      size: 0
+      nfiles: 1
+    - path: reports/metrics.json
+      hash: md5
+      md5: 8a80554c91d9fca8acb82f023de02f11
+      size: 3

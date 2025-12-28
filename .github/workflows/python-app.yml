@@ -41,6 +41,9 @@ jobs:
 
       # Unit Test
       - name: Test with pytest
+        env:
+          WANDB_API_KEY: ${{ secrets.WANDB_API_KEY }}
+          WANDB_MODE: disabled
         run: |
           pytest tests/
 

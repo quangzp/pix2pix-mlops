@@ -19,6 +19,7 @@ model:
     ndf: 64
     ngf: 64
     n_layers: 3
+    num_D: 2
     norm_layer: "instance"
 
   # Loss weights

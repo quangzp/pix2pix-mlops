@@ -5,6 +5,9 @@ training:
   device: "mps" # Change to cuda if using NVIDIA GPU
   save_every: 5
   accumulate_grad_batches: 1
+  lambda_feat: 10.0
+  replay_pool_size: 10000
+  resume_from: null
 
   # Optimizer configuration
   optimizer:

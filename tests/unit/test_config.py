@@ -14,7 +14,10 @@ def test_hydra_config_load():
         assert isinstance(cfg.paths.models, str)
 
         raw_path = Path(cfg.paths.raw)
-        assert raw_path.parent.exists() or raw_path.exists()
+
+        raw_path.parent.mkdir(parents=True, exist_ok=True)
+
+        assert raw_path.parent.exists()
 
         assert cfg.dataset is not None
         assert cfg.training is not None
