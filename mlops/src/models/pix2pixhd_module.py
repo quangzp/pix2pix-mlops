@@ -12,7 +12,6 @@ from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import transforms
 from tqdm import tqdm
-import wandb
 
 
 class Pix2PixHDDataset(torch.utils.data.Dataset):
@@ -177,7 +176,8 @@ class Pix2PixHD(pl.LightningModule):
             pred_true = self.discriminator(torch.cat([data, target], axis=1))
 
         # Feature matching loss
-        loss_adv_feat = torch.tensor(0.0, device=pred_fake[0].device)
+        device = pred_fake[0][0].device if isinstance(pred_fake[0], list) else pred_fake[0].device
+        loss_adv_feat = torch.tensor(0.0, device=device)
         adv_feats_count = 0
         for d_fake_out, d_true_out in zip(pred_fake, pred_true):
             for l_fake, l_true in zip(d_fake_out[:-1], d_true_out[:-1]):
@@ -261,14 +261,13 @@ class Pix2PixHD(pl.LightningModule):
             out_file = os.path.join(self.checkpoint_dir, "images", f"{epoch}_{iteration}.jpg")
             cv2.imwrite(out_file, matrix)
 
-            try:
-                matrix_rgb = cv2.cvtColor(matrix, cv2.COLOR_BGR2RGB)
+            # try:
+            #     matrix_rgb = cv2.cvtColor(matrix, cv2.COLOR_BGR2RGB)
 
-                wandb.log(
-                    {"generated_examples": [wandb.Image(matrix_rgb, caption=f"Epoch {epoch}")]}
-                )
-            except Exception:
-                pass
+            #     img = wandb.Image(matrix_rgb, caption=f"Epoch {epoch}")  # type: ignore[attr-defined]
+            #     wandb.log({"generated_examples": [img]})  # type: ignore[attr-defined]
+            # except Exception:
+            #     pass
 
     def save_checkpoint(self, epoch: int):
         """
