@@ -46,3 +46,5 @@ reports/
 
 # Ignore data (optional, if you don't want to copy raw/processed data)
 data/
+
+mlops/download_and_prepare_data.py
