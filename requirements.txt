@@ -11,7 +11,7 @@ python-dotenv>=1.0.0
 # MLOps
 mlflow>=2.0.0
 dvc>=2.0.0
-wandb>=0.15.0
+wandb==0.15.10
 
 # Data processing
 pandas>=2.0.0
@@ -47,7 +47,5 @@ pre-commit==3.6.0
 # Logging
 loguru>=0.6.0
 
-# kaggle
-kagglehub
 
 -e .
