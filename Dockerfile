@@ -8,7 +8,7 @@ ENV PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-# 1️⃣ Fixed Syntax: Removed the extra "install -y" inside the list
+# 1️⃣ System + Python 3.10
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.10 \
     python3.10-distutils \
@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
+
 
 # 2️⃣ Fix symlinks (Ubuntu 22.04 usually already has python3 -> python3.10)
 RUN ln -sf /usr/bin/python3.10 /usr/bin/python3 && \
