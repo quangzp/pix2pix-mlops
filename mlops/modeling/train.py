@@ -19,7 +19,19 @@ from mlops.src.models.pix2pixhd_module import Pix2PixHD, Pix2PixHDDataset
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def main(cfg: DictConfig):
     # ---- Dataset paths ----
-    project_root = Path(get_original_cwd())
+    # Get project root - handle both running from root and from subdirectories
+    original_cwd = Path(get_original_cwd())
+    # If we're in a subdirectory, go up to project root
+    if (original_cwd / "mlops").exists() and (original_cwd / "data").exists():
+        project_root = original_cwd
+    elif (original_cwd.parent / "mlops").exists() and (original_cwd.parent / "data").exists():
+        project_root = original_cwd.parent
+    else:
+        project_root = original_cwd
+
+    logger.info(f"Project root: {project_root}")
+    logger.info(f"Original CWD: {original_cwd}")
+
     dataset_path = project_root / cfg.paths.raw
     feature_folder = str(project_root / cfg.dataset.processed_sketch_dir)
     label_folder = str(project_root / cfg.dataset.processed_image_dir)
@@ -83,6 +95,45 @@ def main(cfg: DictConfig):
         logger.info(f"Images directory: {images_dir}")
         logger.info(f"Feature folder: {feature_folder}")
         logger.info(f"Label folder: {label_folder}")
+
+        # Validate paths exist
+        images_dir_path = Path(images_dir)
+        sketches_dir = images_dir_path / "sketches"
+        images_dir_check = images_dir_path / "images"
+
+        if not images_dir_path.exists():
+            raise FileNotFoundError(
+                f"Images directory does not exist: {images_dir_path}\n"
+                f"Please ensure data is processed and available at this path."
+            )
+        if not sketches_dir.exists():
+            raise FileNotFoundError(
+                f"Sketches directory does not exist: {sketches_dir}\n"
+                f"Please run data processing script first."
+            )
+        if not images_dir_check.exists():
+            raise FileNotFoundError(
+                f"Images directory does not exist: {images_dir_check}\n"
+                f"Please run data processing script first."
+            )
+
+        # Check for image files
+        sketch_files = list(sketches_dir.glob("*.jpg"))
+        image_files = list(images_dir_check.glob("*.jpg"))
+
+        logger.info(f"Found {len(sketch_files)} sketch files and {len(image_files)} image files")
+
+        if len(sketch_files) == 0:
+            raise ValueError(
+                f"No .jpg files found in {sketches_dir}\n"
+                f"Please ensure data processing has been completed."
+            )
+        if len(image_files) == 0:
+            raise ValueError(
+                f"No .jpg files found in {images_dir_check}\n"
+                f"Please ensure data processing has been completed."
+            )
+
         train_dataset = Pix2PixHDDataset(
             images_dir=images_dir,
             feature_fold="sketches/",
@@ -91,7 +142,20 @@ def main(cfg: DictConfig):
         )
         logger.info(f"Dataset size: {len(train_dataset)}")
 
+        if len(train_dataset) == 0:
+            raise ValueError(
+                "Dataset is empty! Please check:\n"
+                f"1. Data exists in {sketches_dir}\n"
+                f"2. File naming matches between sketches and images\n"
+                f"3. Files are .jpg format"
+            )
+
         # Create train/test split
+        if len(train_dataset) < 2:
+            raise ValueError(
+                f"Dataset too small ({len(train_dataset)} samples). Need at least 2 samples for train/test split."
+            )
+
         train_size = int(0.8 * len(train_dataset))
         test_size = len(train_dataset) - train_size
         train_ds, test_ds = torch.utils.data.random_split(train_dataset, [train_size, test_size])
